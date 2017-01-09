@@ -80,6 +80,11 @@ __PACKAGE__->table("user_profile");
   is_nullable: 1
   size: 45
 
+=head2 mobile
+
+  data_type: 'integer'
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -102,6 +107,8 @@ __PACKAGE__->add_columns(
   { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 1 },
   "gender",
   { data_type => "varchar", is_nullable => 1, size => 45 },
+  "mobile",
+  { data_type => "integer", is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -134,8 +141,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-01-08 21:32:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:6b1zRcoofDm1nue9z5sCRQ
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-01-09 20:57:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+Kzbsz6Olz2EjKyrPWIWSQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

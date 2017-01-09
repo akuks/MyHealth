@@ -40,6 +40,7 @@ __PACKAGE__->table("relationship");
 =head2 relationship_id
 
   data_type: 'integer'
+  is_auto_increment: 1
   is_nullable: 0
 
 =head2 relationship_name
@@ -52,7 +53,7 @@ __PACKAGE__->table("relationship");
 
 __PACKAGE__->add_columns(
   "relationship_id",
-  { data_type => "integer", is_nullable => 0 },
+  { data_type => "integer", is_auto_increment => 1, is_nullable => 0 },
   "relationship_name",
   { data_type => "varchar", is_nullable => 0, size => 45 },
 );
@@ -68,6 +69,20 @@ __PACKAGE__->add_columns(
 =cut
 
 __PACKAGE__->set_primary_key("relationship_id");
+
+=head1 UNIQUE CONSTRAINTS
+
+=head2 C<relationship_name_UNIQUE>
+
+=over 4
+
+=item * L</relationship_name>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("relationship_name_UNIQUE", ["relationship_name"]);
 
 =head1 RELATIONS
 
@@ -87,8 +102,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-01-08 21:32:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:jruUwJCkcxzBchEkQEzjsA
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-01-09 20:57:05
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vVkhH7PlgNEBCeIl4apMpw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
