@@ -147,6 +147,17 @@ sub reset_password {
   return;
 }
 
+# To get login ID
+sub get_login_id {
+  my ($self, $user) = @_;
+
+  my $login_id = $self->{_dbs}->resultset('Login')->find({
+    email  => $user
+  });
+
+  return $login_id->login_id;
+}
+
 1;
 
 __END__

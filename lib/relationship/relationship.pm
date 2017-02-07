@@ -58,7 +58,7 @@ sub _relationship {
 
   while(my $result = $rs->next) {
 
-#Creating relation hash and this has needs to be retun to the API.
+#Creating relation hash and this has needs to be return to the API.
     $relation{$result->relationship_name} = {
       relationship_name => $result->relationship_name,
       relationship_id => $result->relationship_id

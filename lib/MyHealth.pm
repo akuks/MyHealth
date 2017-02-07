@@ -20,6 +20,15 @@ my ($db) = userlogin->new();
 # At present the logger is not setup. Will introduce logger soon
 #print Dumper($db->{_dbs});
 
+=head1 Name
+Name of the Package: MyHealth
+
+=head2 Description
+
+=head3 Routes
+
+=cut
+
 get '/' => sub {
     return {message => 'Hello There'};
 };
@@ -79,20 +88,35 @@ return {message => $new_user};
   }
 };
 
+#
 # This API will be used to update the User Profile
+#
 post '/login/user/update/:user/:values' => sub {
+
   if (! $db->{params->{user}}->{login_session_key}) {
+
     return {
-      ERROR_ => 'Invalid API Query as User is not logged in ot not valid.'
+      ERROR_1104 => 'Invalid API Query as User is not logged in.'
     };
   }
 
   my @values = split(/\&/, params->{values});
+  chomp(@values);
 
-  my $update_message = updateProfile->new(
+  my $user_id = $db->get_login_id(params->{user});
+
+  my $update = updateProfile->new(
                           _dbs   => $db->{_dbs},
-                          _value => \@values
                       );
+
+  my $flag = $update->set_first_name($values[0]);
+  _check_flag($flag);
+
+  my $msg = $update->insert_in_db($user_id);
+
+  return {
+          values => $update->{_toUpdate}
+        };
 
 };
 
