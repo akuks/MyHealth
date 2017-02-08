@@ -103,16 +103,17 @@ post '/login/user/update/:user/:values' => sub {
   my @values = split(/\&/, params->{values});
   chomp(@values);
 
-  my $user_id = $db->get_login_id(params->{user});
+  my $login_id = $db->get_login_id(params->{user});
 
   my $update = updateProfile->new(
                           _dbs   => $db->{_dbs},
+                          _user  => $login_id
                       );
 
   my $flag = $update->set_first_name($values[0]);
   _check_flag($flag);
 
-  my $msg = $update->insert_in_db($user_id);
+  my $msg = $update->insert_in_db;
 
   return {
           values => $update->{_toUpdate}

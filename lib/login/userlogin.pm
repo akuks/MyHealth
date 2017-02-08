@@ -62,8 +62,8 @@ sub _initialize {
       'dbi:mysql:database='.$self
                        ->{_confDetails}
                        ->{database},
-       $self->{_confDetails}->{username},
-       $self->{_confDetails}->{password}
+              $self->{_confDetails}->{username},
+              $self->{_confDetails}->{password}
   ) or die 'Can\'t connect to database', "\n";
 
   undef $self->{_confDetails};

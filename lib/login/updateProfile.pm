@@ -34,9 +34,37 @@ sub new {
 }
 
 sub insert_in_db {
-  my ($self, $user_id) = @_;
+  my ($self) = shift;
 
-  my $profile = $self->{_dbs}->resultset('UserProfile');
+  my $profile = $self->{_dbs}->resultset('UserProfile')->create({
+
+    login_id    => $self->{_user},
+    first_name  => $self->{_user}->{first_name},
+    middle_name => $self->{_user}->{middle_name},
+    last_name   => $self->{_user}->{last_name},
+    dob         => $self->{_user}->{dob},
+    gender      => $self->{_user}->{gender},
+    mobile      => $self->{_user}->{mobile},
+    blood_group => $self->{_user}->{blood_group},
+    weight      => $self->{_user}->{weight},
+    height      => $self->{_user}->{height},
+    aadhar_card => $self->{_user}->{aadhar},
+    address     => $self->{_user}->{address},
+    pin_code    => $self->{_user}->{pincode},
+    created_at  => _get_mySql_timestamp(),
+    updated_at  => _get_mySql_timestamp()
+  });
+
+  return ('Profile Updated');
+}
+
+# To get the timestamp
+sub _get_mySql_timestamp {
+
+  my $date = localtime->ymd;
+  my $time = localtime->hms;
+
+  return $date.' '.$time;
 
 }
 
@@ -162,7 +190,7 @@ sub get_last_name {
   return $self->{_user}->{last_name};
 }
 
-sub get_geder {
+sub get_gender {
   my $self = shift;
 
   return $self->{_user}->{gender};
@@ -216,6 +244,5 @@ sub get_pincode {
 
   return $self->{_user}->{pincode};
 }
-
 
 1;
