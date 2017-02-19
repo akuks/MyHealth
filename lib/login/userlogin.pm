@@ -79,14 +79,23 @@ sub checkuser {
 
   my $user_result = $self->{_dbs}->resultset('Login');
 
-  my $result = $user_result->find({
-    email    => $user,
-    password => md5_base64($password)
+  my $result = $user_result->search({
+     -and => [
+        email    => { like => $user },
+        password => { like => md5_base64($password) }
+      ]
   });
 
-  if (defined $result){
-    $self->{$user}->{sessionKey} = md5_base64($password);
-    return $self->{$user}->{sessionKey};
+  print "Result : ", $result, "\n";
+
+  if ($result == 1){
+#    if ($result->password->match(md5_base64($password))){
+      $self->{$user}->{sessionKey} = md5_base64($password);
+      return $self->{$user}->{sessionKey};
+#    }
+#    else{
+#      return 0;
+#    }
   }
   else{
     return 0;
@@ -113,7 +122,8 @@ sub create_new_user {
 # Double Check if User already exist in DB.
   my $output = $self->checkuser($user, $password);
 
-  if ($output ne 0){
+
+  if ($output ne ''){
     print "output : ", $output;
     return ('Fatal Error, User Already Exist in database');
   }

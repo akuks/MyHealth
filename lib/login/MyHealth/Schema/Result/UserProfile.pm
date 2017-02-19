@@ -82,7 +82,53 @@ __PACKAGE__->table("user_profile");
 
 =head2 mobile
 
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 20
+
+=head2 blood_group
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 45
+
+=head2 weight
+
+  data_type: 'float'
+  is_nullable: 1
+
+=head2 height
+
+  data_type: 'float'
+  is_nullable: 1
+
+=head2 aadhar_card
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
+=head2 address
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 255
+
+=head2 pin_code
+
   data_type: 'integer'
+  is_nullable: 1
+
+=head2 created_at
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  is_nullable: 1
+
+=head2 updated_at
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
   is_nullable: 1
 
 =cut
@@ -108,7 +154,31 @@ __PACKAGE__->add_columns(
   "gender",
   { data_type => "varchar", is_nullable => 1, size => 45 },
   "mobile",
+  { data_type => "varchar", is_nullable => 1, size => 20 },
+  "blood_group",
+  { data_type => "varchar", is_nullable => 1, size => 45 },
+  "weight",
+  { data_type => "float", is_nullable => 1 },
+  "height",
+  { data_type => "float", is_nullable => 1 },
+  "aadhar_card",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "address",
+  { data_type => "varchar", is_nullable => 1, size => 255 },
+  "pin_code",
   { data_type => "integer", is_nullable => 1 },
+  "created_at",
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    is_nullable => 1,
+  },
+  "updated_at",
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    is_nullable => 1,
+  },
 );
 
 =head1 PRIMARY KEY
@@ -141,8 +211,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-01-09 20:57:05
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+Kzbsz6Olz2EjKyrPWIWSQ
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-02-20 00:18:07
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:zx677OE2/CD9VS3JCNSgKw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

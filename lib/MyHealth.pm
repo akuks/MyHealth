@@ -103,22 +103,65 @@ post '/login/user/update/:user/:values' => sub {
   my @values = split(/\&/, params->{values});
   chomp(@values);
 
-  my $login_id = $db->get_login_id(params->{user});
+  if (scalar(@values) != 12){
+    return { ERROR_1105 => 'Invalid Number of Elements. '};
+  }
 
-  my $update = updateProfile->new(
-                          _dbs   => $db->{_dbs},
-                          _user  => $login_id
-                      );
+  my %login;
+  $login{login_id} = $db->get_login_id(params->{user});
 
-  my $flag = $update->set_first_name($values[0]);
-  _check_flag($flag);
+  if(!$login{login_id}) {
+    return { ERROR_1105 => 'User Doesn\'t Exist.'};
+  }
 
-  my $msg = $update->insert_in_db;
+# To make passing variable as hash reference :)
+  my $login = \%login::;
+
+  #print Dumper($db->{_dbs});
+
+  my $update = updateProfile->new($db->{_dbs}, $login->{login_id});
+
+  $update->set_login_id($login{login_id});
+  $update->set_first_name($values[0]);
+  $update->set_middle_name($values[1]) if $values[1];
+  $update->set_last_name($values[2]);
+  $update->set_gender($values[3]);
+  $update->set_dob($values[4]);
+  $update->set_blood_group($values[5]);
+  $update->set_weight($values[6]);
+  $update->set_height($values[7]);
+  $update->set_mobile($values[8]);
+  $update->set_aadhar($values[9]) if $values[9];
+  $update->set_address($values[10]) if $values[10];
+  $update->set_pincode($values[11])if $values[11];
+
+  my $msg = $update->insert_in_db();
 
   return {
           values => $update->{_toUpdate}
         };
 
+};
+#
+# Add family Members
+#
+post '/addrelative/:user/:value' => sub {
+
+##################
+
+  if (! $db->{params->{user}}->{login_session_key}) {
+
+    return {
+      ERROR_1104 => 'Invalid API Query as User is not logged in.'
+    };
+  }
+##############
+
+
+
+  return {
+      values => 'Returned'
+  };
 };
 
 post '/forgotpassword/:user' => sub {
