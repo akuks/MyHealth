@@ -80,12 +80,13 @@ sub insert_in_db {
 
 #
 # Destroy From Memory
+#
+ ($login_id, $first_name, $middle_name, $last_name,
+         $dob, $gender, $mobile, $blood_group, $weight,
+         $height, $aadhar_card, $address, $pin_code,
+         $created_at, $updated_at
+        ) = undef * 15;
 
-#  #undef ($login_id, $first_name, $middle_name, $last_name,
-#         $dob, $gender, $mobile, $blood_group, $weight,
-#         $height, $aadhar_card, $address, $pin_code,
-#         $created_at, $updated_at
-#        );
   return ('Profile Updated');
 }
 

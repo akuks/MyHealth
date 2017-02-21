@@ -79,9 +79,20 @@ post '/login/newuser/:user/:password' => sub {
                    params->{user},
                    params->{password}
                  );
-return {message => $new_user};
+#return {message => $new_user};
   if (defined $new_user){
-    return {message => $new_user};
+    my $verification_email = sendEmail->new(
+         params->{user},
+         'noreply@linkinbridges.com',
+         params->{password},
+    );
+
+    $verification_email->send_email;
+
+    return {
+      message => $new_user.' is Created.',
+      email_message => 'Verification Email has been sent to your Account.'
+    };
   }
   else {
     return {message => 'Unable to create '.params->{user}.'.'};
@@ -138,14 +149,14 @@ post '/login/user/update/:user/:values' => sub {
   my $msg = $update->insert_in_db();
 
   return {
-          values => $update->{_toUpdate}
+          values => $msg
         };
 
 };
 #
 # Add family Members
 #
-post '/addrelative/:user/:value' => sub {
+post '/family/:user/:values' => sub {
 
 ##################
 
@@ -157,11 +168,44 @@ post '/addrelative/:user/:value' => sub {
   }
 ##############
 
+  my @values = split(/\&/, params->{values});
+  chomp(@values);
 
+  if (scalar(@values) != 10){
+    return { ERROR_1105 => 'Invalid Number of Elements. '};
+  }
+
+  my %login;
+  $login{login_id} = $db->get_login_id(params->{user});
+
+  if(!$login{login_id}) {
+    return { ERROR_1105 => 'User Doesn\'t Exist.'};
+  }
+
+  # To make passing variable as hash reference :)
+  my $login = \%login::;
+
+  my $family = familyProfile->new($db->{_dbs}, $login->{login_id});
+
+  $family->set_login_id($login{login_id});
+  $family->set_first_name($values[0]);
+  $family->set_middle_name($values[1]) if $values[1];
+  $family->set_last_name($values[2]);
+  $family->set_gender($values[3]);
+  $family->set_dob($values[4]);
+  $family->set_blood_group($values[5]);
+  $family->set_weight($values[6]);
+  $family->set_height($values[7]);
+  $family->set_mobile($values[8]);
+  $family->set_aadhar($values[9]) if $values[9];
+  $family->set_address($values[10]) if $values[10];
+  $family->set_pincode($values[11])if $values[11];
+
+  my $msg = $family->insert_in_db();
 
   return {
-      values => 'Returned'
-  };
+          values => $msg
+        };
 };
 
 post '/forgotpassword/:user' => sub {
