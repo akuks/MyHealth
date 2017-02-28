@@ -4,8 +4,12 @@ use Dancer2;
 #Custom Packages
 use login::userlogin;
 use login::updateProfile;
+use login::familyProfile;
+
 use login::MyHealth::Schema;
 use relationship::relationship;
+
+use MyHealthLogger qw($log);
 
 use Data::Dumper;
 
@@ -16,6 +20,13 @@ our $VERSION = '0.1';
 
 #Database Login is Defined
 my ($db) = userlogin->new();
+
+if ($db) {
+  $log->info('DB Connection Ok');
+}
+else {
+  $log->info('Error in DB Connection');
+}
 
 # At present the logger is not setup. Will introduce logger soon
 #print Dumper($db->{_dbs});
@@ -149,7 +160,7 @@ post '/login/user/update/:user/:values' => sub {
   my $msg = $update->insert_in_db();
 
   return {
-          values => $msg
+          values => $update
         };
 
 };
@@ -170,6 +181,8 @@ post '/family/:user/:values' => sub {
 
   my @values = split(/\&/, params->{values});
   chomp(@values);
+
+  print "Number of Elements : ", scalar(@values), "\n";
 
   if (scalar(@values) != 10){
     return { ERROR_1105 => 'Invalid Number of Elements. '};
@@ -196,10 +209,8 @@ post '/family/:user/:values' => sub {
   $family->set_blood_group($values[5]);
   $family->set_weight($values[6]);
   $family->set_height($values[7]);
-  $family->set_mobile($values[8]);
-  $family->set_aadhar($values[9]) if $values[9];
-  $family->set_address($values[10]) if $values[10];
-  $family->set_pincode($values[11])if $values[11];
+  $family->set_aadhar($values[8]) if $values[8];
+  $family->set_relationship_id($values[9]);
 
   my $msg = $family->insert_in_db();
 
