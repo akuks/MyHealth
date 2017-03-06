@@ -49,7 +49,6 @@ sub new {
 }
 
 sub _relationship {
-  use Data::Dumper;
 
   my $self = shift;
   my %relation;

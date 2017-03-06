@@ -107,6 +107,24 @@ __PACKAGE__->table("family_profile");
   is_nullable: 1
   size: 255
 
+=head2 age
+
+  data_type: 'varchar'
+  is_nullable: 1
+  size: 45
+
+=head2 created_at
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  is_nullable: 1
+
+=head2 updated_at
+
+  data_type: 'timestamp'
+  datetime_undef_if_invalid: 1
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -134,6 +152,20 @@ __PACKAGE__->add_columns(
   { data_type => "float", is_nullable => 1 },
   "aadhar_card",
   { data_type => "varchar", is_nullable => 1, size => 255 },
+  "age",
+  { data_type => "varchar", is_nullable => 1, size => 45 },
+  "created_at",
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    is_nullable => 1,
+  },
+  "updated_at",
+  {
+    data_type => "timestamp",
+    datetime_undef_if_invalid => 1,
+    is_nullable => 1,
+  },
 );
 
 =head1 PRIMARY KEY
@@ -196,8 +228,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-02-20 22:33:37
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:8KqZ86mEVifAj8f2mdKj2g
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-03-06 23:29:47
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:18gLaOPOfrfIE6xKDkYrog
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -43,12 +43,6 @@ __PACKAGE__->table("vaccination_schedule");
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 next_vaccination_id
-
-  data_type: 'integer'
-  is_foreign_key: 1
-  is_nullable: 0
-
 =head2 vaccination_date
 
   data_type: 'date'
@@ -68,13 +62,16 @@ __PACKAGE__->table("vaccination_schedule");
   extra: {list => [0,1]}
   is_nullable: 1
 
+=head2 vaccination_id
+
+  data_type: 'integer'
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
   "vschedule_id",
   { data_type => "bigint", is_auto_increment => 1, is_nullable => 0 },
-  "next_vaccination_id",
-  { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "vaccination_date",
   { data_type => "date", datetime_undef_if_invalid => 1, is_nullable => 0 },
   "family_profile_id",
@@ -86,6 +83,8 @@ __PACKAGE__->add_columns(
     extra => { list => [0, 1] },
     is_nullable => 1,
   },
+  "vaccination_id",
+  { data_type => "integer", is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -117,24 +116,9 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
-=head2 next_vaccination
 
-Type: belongs_to
-
-Related object: L<MyHealth::Schema::Result::Vaccination>
-
-=cut
-
-__PACKAGE__->belongs_to(
-  "next_vaccination",
-  "MyHealth::Schema::Result::Vaccination",
-  { vaccination_id => "next_vaccination_id" },
-  { is_deferrable => 1, on_delete => "NO ACTION", on_update => "NO ACTION" },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-01-08 21:32:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BDdUJ6VlrGq1IH6dfWEqTg
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-03-06 23:03:20
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:bt1TpYDRzCB0D02ywesERQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

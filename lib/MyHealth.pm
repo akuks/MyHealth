@@ -8,6 +8,7 @@ use login::familyProfile;
 
 use login::MyHealth::Schema;
 use relationship::relationship;
+use vaccination::getVaccination;
 
 use MyHealthLogger qw($log);
 
@@ -198,7 +199,10 @@ post '/family/:user/:values' => sub {
   # To make passing variable as hash reference :)
   my $login = \%login::;
 
-  my $family = familyProfile->new($db->{_dbs}, $login->{login_id});
+  my $family = familyProfile->new(
+                       $db->{_dbs},
+                       $login->{login_id}
+                  );
 
   $family->set_login_id($login{login_id});
   $family->set_first_name($values[0]);
@@ -212,10 +216,23 @@ post '/family/:user/:values' => sub {
   $family->set_aadhar($values[8]) if $values[8];
   $family->set_relationship_id($values[9]);
 
+#
+# Check for Duplicate family Members
+#
+
+  my $dup = $family->check_duplicate_nodes;
+
+  if ($dup == 1){
+    return {values => 1};
+  }
+
   my $msg = $family->insert_in_db();
 
+  $log->info($values[0].' '.$values[3].' Member to be Added');
+  $log->info('Family Member Added For User '.$login->{login_id});
+
   return {
-          values => $msg
+          values => $msg->{_user}
         };
 };
 
@@ -243,6 +260,22 @@ get '/relationship' => sub {
   my $relation = relationship->new($db->{_dbs});
 
   return {Relation => $relation->{_relation}};
+};
+
+#get Vaccination and its ID
+
+get '/vaccination' => sub {
+  my $vaccination = getVaccination->new($db->{_dbs});
+
+  return {Vaccination => $vaccination->{_vaccination}};
+};
+
+# To be updated
+get '/getVaccinationSchedule/:user/' => sub {
+
+  return {
+    VSchedule => 'Schedule For Vaccination'
+  }
 };
 
 # Catch Invalid REST API Call. If user calls invalid API, User will get the

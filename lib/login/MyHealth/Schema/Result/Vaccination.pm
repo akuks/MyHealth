@@ -70,26 +70,9 @@ __PACKAGE__->add_columns(
 
 __PACKAGE__->set_primary_key("vaccination_id");
 
-=head1 RELATIONS
 
-=head2 vaccination_schedules
-
-Type: has_many
-
-Related object: L<MyHealth::Schema::Result::VaccinationSchedule>
-
-=cut
-
-__PACKAGE__->has_many(
-  "vaccination_schedules",
-  "MyHealth::Schema::Result::VaccinationSchedule",
-  { "foreign.next_vaccination_id" => "self.vaccination_id" },
-  { cascade_copy => 0, cascade_delete => 0 },
-);
-
-
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-01-08 21:32:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:EySKoGwk9zA2YeCJN/+7DA
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-03-06 23:03:20
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:vH5oTRcIU2zc4PrBDm/usg
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
