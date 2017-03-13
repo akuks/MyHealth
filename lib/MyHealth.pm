@@ -165,6 +165,7 @@ post '/login/user/update/:user/:values' => sub {
         };
 
 };
+
 #
 # Add family Members
 #
@@ -236,6 +237,34 @@ post '/family/:user/:values' => sub {
         };
 };
 
+#
+# Get Family Details
+# Relation Between User ID and Family ID
+#
+
+get '/family/:user/:id' => sub {
+
+  ##################
+
+    if (! $db->{params->{user}}->{login_session_key}) {
+
+      return {
+        ERROR_1104 => 'Invalid API Query as User is not logged in.'
+      };
+    }
+  ##############
+
+  my $family = familyProfile->new(
+                       $db->{_dbs},
+                       params->{id}
+                  );
+
+  my $family_details = $family->get_family_details;
+
+  return { Family_Details => $family_details};
+};
+
+
 post '/forgotpassword/:user' => sub {
   my $reset_password = $db->reset_password(params->{user});
 
@@ -276,6 +305,76 @@ get '/getVaccinationSchedule/:user/' => sub {
   return {
     VSchedule => 'Schedule For Vaccination'
   }
+};
+
+#Get the Family ID of the User
+
+get '/devscreening/question/:user' => sub {
+
+  ##################
+
+    if (! $db->{params->{user}}->{login_session_key}) {
+
+      return {
+        ERROR_1104 => 'Invalid API Query as User is not logged in.'
+      };
+    }
+  ##############
+
+  my %login;
+  $login{login_id} = $db->get_login_id(params->{user});
+
+  if(!$login{login_id}) {
+    return { ERROR_1105 => 'User Doesn\'t Exist.'};
+  }
+
+  # To make passing variable as hash reference :)
+  my $login = \%login::;
+
+  my $family = devScreening->new(
+                       $db->{_dbs},
+                       $login->{login_id}
+                  );
+
+ return { FP => $family->{_user};
+};
+
+#
+# Get the answers of the Question from the Application.
+# Update by Tomorrow
+#
+
+post '/devscreening/:user/:familyid/:questionid/:response' => sub {
+
+  ##################
+
+    if (! $db->{params->{user}}->{login_session_key}) {
+
+      return {
+        ERROR_1104 => 'Invalid API Query as User is not logged in.'
+      };
+    }
+  ##############
+  
+  my %login;
+  $login{login_id} = $db->get_login_id(params->{user});
+
+  if(!$login{login_id}) {
+    return { ERROR_1105 => 'User Doesn\'t Exist.'};
+  }
+
+  # To make passing variable as hash reference :)
+  my $login = \%login::;
+
+  my $family = devScreening->new(
+                       $db->{_dbs},
+                       $login->{login_id}
+                  );
+
+  $family->set_familyid(params->{familyid});
+  $family->set_questionid(params->{questionid});
+  $family->set_response(params->{response});
+
 };
 
 # Catch Invalid REST API Call. If user calls invalid API, User will get the

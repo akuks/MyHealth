@@ -345,6 +345,22 @@ sub _get_age {
 }
 
 #
+# Get Family Details
+#
+
+sub get_family_details {
+  my $self = shift;
+
+  my $result->{_family_details} = $self->{_dbs}->resultset('FamilyProfile')->search({
+    -and => [
+        login_id => { like => $self->get_first_name },
+      ]
+  });
+
+  return $result->{_family_details};
+}
+
+#
 # Check Duplicate Nodes
 #
 

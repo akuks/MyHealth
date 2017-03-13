@@ -182,6 +182,21 @@ __PACKAGE__->set_primary_key("family_profile_id");
 
 =head1 RELATIONS
 
+=head2 development_screening_trackers
+
+Type: has_many
+
+Related object: L<MyHealth::Schema::Result::DevelopmentScreeningTracker>
+
+=cut
+
+__PACKAGE__->has_many(
+  "development_screening_trackers",
+  "MyHealth::Schema::Result::DevelopmentScreeningTracker",
+  { "foreign.family_id" => "self.relationship_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 login
 
 Type: belongs_to
@@ -228,8 +243,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-03-06 23:29:47
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:18gLaOPOfrfIE6xKDkYrog
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-03-12 23:21:55
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:yBph+FO0LO3BHzFhP5owOQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

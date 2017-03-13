@@ -37,7 +37,7 @@ sub _vaccination {
 #Creating relation hash and this has needs to be return to the API.
     $vaccination{$result->vaccine_name} = {
       vaccine_name => $result->vaccine_name,
-      vaccine_id => $result->vaccination_id
+      vaccine_id   => $result->vaccination_id
     }
   }
 
