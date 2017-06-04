@@ -19,7 +19,6 @@ sub new {
   my $self = {
     _to   => shift,
     _from => shift,
-    _pass => shift
   };
 
   bless $self, $class;
@@ -30,10 +29,10 @@ sub new {
 sub send_email {
   my $self = shift;
 
-  my $email = Email::Simple::create(
+  my $email = Email::Simple->create(
     header => [
       To      => $self->{_to},
-      From    => $self->{from},
+      From    => $self->{_from},
       Subject => 'Account Verification Email From LinkinBridges.'
     ],
     body => _get_body_message(),
@@ -43,8 +42,40 @@ sub send_email {
 }
 
 sub _get_body_message {
+  my $self = shift;
+
+  my $password;
   my $message = "Click on the below link to verify your account.\n".
                  'http://localhost:5000/verification/'.$self->{_to}.'/'.
                  md5_base64($password).'/verifynow';
   return $message;
 }
+
+sub send_reset_password {
+  my $self = shift;
+
+  my $code = 1000 + int (rand(9999 - 1000));
+
+  my $email = Email::Simple->create(
+    header => [
+      To      => $self->{_to},
+      From    => $self->{_from},
+      Subject => 'Password Reset Verification Code.'
+    ],
+    body => 'Hi User,
+
+    Your Verification Code To Reset Password is : '. $code.
+    '
+
+    Regards,
+    Team Linkin Bridges
+
+    NOTE: Please do not reply to this email',
+  );
+
+  sendmail($email);
+
+  return $code;
+}
+
+1;

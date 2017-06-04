@@ -5,6 +5,7 @@ use warnings;
 
 use lib "lib/login";
 use Digest::MD5 qw(md5_base64);
+use MyHealthLogger qw<$log>;
 
 use Data::Dumper;
 use Time::Piece;
@@ -89,15 +90,32 @@ sub checkuser {
   print "Result : ", $result, "\n";
 
   if ($result == 1){
-#    if ($result->password->match(md5_base64($password))){
       $self->{$user}->{sessionKey} = md5_base64($password);
       return $self->{$user}->{sessionKey};
-#    }
-#    else{
-#      return 0;
-#    }
   }
   else{
+    return 0;
+  }
+}
+
+#
+# Check Email ID Existence
+#
+sub checkemail {
+  my ($self, $user) = @_;
+
+  my $user_result = $self->{_dbs}->resultset('Login');
+
+  my $result = $user_result->search({
+     -and => [
+        email    => { like => $user },
+      ]
+  });
+
+  if ($result == 1){
+    return 1;
+  }
+  else {
     return 0;
   }
 }
@@ -121,7 +139,6 @@ sub create_new_user {
 
 # Double Check if User already exist in DB.
   my $output = $self->checkuser($user, $password);
-
 
   if ($output ne ''){
     print "output : ", $output;
@@ -150,12 +167,28 @@ sub _get_mySql_timestamp {
 
 }
 
+#
 # To be Updated Later
+#
+
 sub reset_password {
   my ($self, $user) = @_;
 
-  return;
+  my $result = $self->{_dbs}->resultset('Login')->search({
+     -and => [
+        email    => { like => $user }
+      ]
+  });
+
+# Succesfully Send the Response.
+  while(my $rs = $result->next){
+      if ($rs->email eq $user) {
+        return 1;
+      }
+  }
+  return 0;
 }
+
 
 # To get login ID
 sub get_login_id {

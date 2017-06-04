@@ -9,6 +9,10 @@ use login::familyProfile;
 use login::MyHealth::Schema;
 use relationship::relationship;
 use vaccination::getVaccination;
+use devScreening::devScreening;
+use sendEmail;
+
+use database::dbConnection;
 
 use MyHealthLogger qw($log);
 
@@ -22,15 +26,24 @@ our $VERSION = '0.1';
 #Database Login is Defined
 my ($db) = userlogin->new();
 
-if ($db) {
+#
+# Database Login Alternate
+# This will be Changed in future and should be merge with the 
+# DBIx::Class. 
+#
+my ($dbh) = dbConnection->new();
+
+if ($db and $dbh) {
   $log->info('DB Connection Ok');
 }
 else {
   $log->info('Error in DB Connection');
 }
 
+
 # At present the logger is not setup. Will introduce logger soon
 #print Dumper($db->{_dbs});
+#print Dumper($dbh);
 
 =head1 Name
 Name of the Package: MyHealth
@@ -41,13 +54,18 @@ Name of the Package: MyHealth
 
 =cut
 
-get '/' => sub {
-    return {message => 'Hello There'};
-};
+# To cehck Email ID is registered with Application
 
-get '/hello' => sub {
-  return {next_message => 'Hello Rest API'};
-};
+get '/checkuser/:user/' => sub {
+  my $output = $db->checkemail(
+                   params->{user}
+              );
+# $output have two values:
+#  1. If User Exist => return generateed sessionKey
+#  2. If User doesn't exist => 0
+
+  return {user_Exist => $output};
+} ;
 
 # To check the existing of User in the database.
 get '/checkuser/:user/:password' => sub  {
@@ -85,13 +103,70 @@ get '/login/safe/:user/:sessionKey' => sub {
   };
 };
 
+#
+# Forgot Password API
+#
+post '/forgotpassword/:user/reset_password' => sub {
+  my $reset_password = $db->reset_password(params->{user});
+
+  if ($reset_password) {
+    my $mail = sendEmail->new(params->{user},
+                              'noreply@linkinbridges.com');
+    my $verification_code = $mail->send_reset_password();
+
+    $dbh->update_user_verification_code($verification_code, params->{user});
+
+    return {
+      fp_message => 'Verification Code is Sent to your registered Email ID.',
+      verification_Code => $verification_code
+    };
+  }
+  else {
+    fp_message => 'Invalid Request!!! :()'
+  }
+};
+
+#
+# Update Password in DB
+#
+post '/updatePassword/:user/:code/:pass1/:pass2' => sub {
+
+# If passwords are not Matched
+
+  if (params->{pass1} ne params->{pass2}) {
+    return {
+      pass_mismatch_error => 'Password Doesn\'t Match'
+    };
+  }
+
+  my $code_sent_verification = $dbh->verify_user_code(params->{code});
+
+#
+# If user enters invalid Verification Code sent 
+#
+  if (!$code_sent_verification){
+    return {
+      code_mismatch_error => 'Verification Code Mismatch'
+    };
+  }
+
+  my $reset = $dbh->update_user_password(
+                        params->{user}, 
+                        params->{pass1}
+                );
+
+  return { reset_message => 'Password Reset Succesfully'} if $reset; # if password reset succesfull
+  return { reset_message => 0}; # if password Reset Fails
+
+};
+
 # To create User Login
 post '/login/newuser/:user/:password' => sub {
   my $new_user = $db->create_new_user(
                    params->{user},
                    params->{password}
                  );
-#return {message => $new_user};
+
   if (defined $new_user){
     my $verification_email = sendEmail->new(
          params->{user},
@@ -264,13 +339,6 @@ get '/family/:user/:id' => sub {
   return { Family_Details => $family_details};
 };
 
-
-post '/forgotpassword/:user' => sub {
-  my $reset_password = $db->reset_password(params->{user});
-
-  return {fp_message => 'New Password is sent to your registered Email ID.'}
-};
-
 get '/logout/:user' => sub {
 
   if ($db->{params->{user}}){
@@ -300,48 +368,25 @@ get '/vaccination' => sub {
 };
 
 # To be updated
-get '/getVaccinationSchedule/:user/' => sub {
+get '/getVaccinationSchedule' => sub {
+
+  my $v_schedule = do('conf/vaccination.conf');
 
   return {
-    VSchedule => 'Schedule For Vaccination'
-  }
+    VSchedule => $v_schedule
+  };
 };
 
-#Get the Family ID of the User
+post '/postVaccinationSchedule/:user' => sub {
 
-get '/devscreening/question/:user' => sub {
-
-  ##################
-
-    if (! $db->{params->{user}}->{login_session_key}) {
-
-      return {
-        ERROR_1104 => 'Invalid API Query as User is not logged in.'
-      };
-    }
-  ##############
-
-  my %login;
-  $login{login_id} = $db->get_login_id(params->{user});
-
-  if(!$login{login_id}) {
-    return { ERROR_1105 => 'User Doesn\'t Exist.'};
-  }
-
-  # To make passing variable as hash reference :)
-  my $login = \%login::;
-
-  my $family = devScreening->new(
-                       $db->{_dbs},
-                       $login->{login_id}
-                  );
-
- return { FP => $family->{_user};
+  return {
+    schedule => 'Schedule Updated'
+  };
 };
 
 #
 # Get the answers of the Question from the Application.
-# Update by Tomorrow
+# Updated
 #
 
 post '/devscreening/:user/:familyid/:questionid/:response' => sub {
@@ -355,7 +400,7 @@ post '/devscreening/:user/:familyid/:questionid/:response' => sub {
       };
     }
   ##############
-  
+
   my %login;
   $login{login_id} = $db->get_login_id(params->{user});
 
@@ -366,6 +411,12 @@ post '/devscreening/:user/:familyid/:questionid/:response' => sub {
   # To make passing variable as hash reference :)
   my $login = \%login::;
 
+  if (params->{response} != 1 or params->{response} != 0) {
+    return {
+      ERROR_INVALID_RESPONSE => 'Only 0 or 1 are Valid Value)'
+     };
+  }
+
   my $family = devScreening->new(
                        $db->{_dbs},
                        $login->{login_id}
@@ -374,6 +425,61 @@ post '/devscreening/:user/:familyid/:questionid/:response' => sub {
   $family->set_familyid(params->{familyid});
   $family->set_questionid(params->{questionid});
   $family->set_response(params->{response});
+
+  $family->set_status;
+
+  my $status = $family->update_development_tracker;
+
+  return {
+    Message   => 'Response Updated',
+    Screening => $family->{_user},
+    Status    => $status
+  };
+};
+
+#
+# Get Dev Screening Results
+#
+
+get '/devscreening/details/:user/:familyid' => sub {
+  ##################
+
+    if (! $db->{params->{user}}->{login_session_key}) {
+
+      return {
+        ERROR_1104 => 'Invalid API Query as User is not logged in.'
+      };
+    }
+  ##############
+
+  my %login;
+  $login{login_id} = $db->get_login_id(params->{user});
+
+  if(!$login{login_id}) {
+    return { ERROR_1105 => 'User Doesn\'t Exist.'};
+  }
+
+  # To make passing variable as hash reference :)
+  my $login = \%login::;
+
+  if (params->{response} != 1 or params->{response} != 0) {
+    return {
+      ERROR_INVALID_RESPONSE => 'Only 0 or 1 are Valid Value)'
+     };
+  }
+
+  my $family = devScreening->new(
+                       $db->{_dbs},
+                       $login->{login_id}
+                  );
+  $family->get_screening_details;
+
+  return {
+    ScreeningDetails => $family->{_user}->{screening}
+  };
+};
+
+post '/updatefamily/:answers' => sub {
 
 };
 

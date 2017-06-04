@@ -25,23 +25,16 @@ sub new {
 
   bless $self, $class;
 
-  $self->infant_vSchedule if $age =~ /Weeks/;
+  $self->{_vacc} = $self->get_vacc;
 
   return $self;
 }
 
-sub infant_vSchedule {
+sub get_vacc {
   my $self = shift;
-
-  my $age = split(/ +/, $self->{_age})
-
-  if ($age < 1) {
-    $self->{_age}->{dueVacc} = ["BCG", "HEPB", "POLIO"];
-    $self->{_age}->{dueDate} = 'Now';
-  }
-
 
   return;
 }
+
 
 1;
