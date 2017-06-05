@@ -29,7 +29,6 @@ _get_body_message	lib/sendEmail.pm	44;"	s
 _get_mySql_timestamp	lib/login/userlogin.pm	161;"	s
 _initialize	lib/login/userlogin.pm	50;"	s
 _relationship	lib/relationship/relationship.pm	51;"	s
-_vaccination	lib/vaccination/getVaccination.pm	28;"	s
 calculate_Age_in_months	lib/devScreening/development_screening.pl	105;"	s
 check_dev_screen_qid	lib/devScreening/development_screening.pl	152;"	s
 check_duplicate_nodes	lib/login/familyProfile.pm	367;"	s
@@ -75,6 +74,7 @@ get_response	lib/devScreening/devScreening.pm	133;"	s
 get_screening_details	lib/devScreening/devScreening.pm	177;"	s
 get_status	lib/devScreening/devScreening.pm	139;"	s
 get_vacc	lib/vaccination/vaccinationScheduler.pm	33;"	s
+get_vaccination	lib/vaccination/getVaccination.pm	29;"	s
 get_weight	lib/login/familyProfile.pm	253;"	s
 get_weight	lib/login/updateProfile.pm	255;"	s
 insert_in_db	lib/login/familyProfile.pm	50;"	s

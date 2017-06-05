@@ -359,14 +359,6 @@ get '/relationship' => sub {
   return {Relation => $relation->{_relation}};
 };
 
-#get Vaccination and its ID
-
-get '/vaccination' => sub {
-  my $vaccination = getVaccination->new($db->{_dbs});
-
-  return {Vaccination => $vaccination->{_vaccination}};
-};
-
 # To be updated
 get '/getVaccinationSchedule' => sub {
 
@@ -382,6 +374,48 @@ post '/postVaccinationSchedule/:user' => sub {
   return {
     schedule => 'Schedule Updated'
   };
+};
+
+# 
+# Update User Vaccination Schedule
+#
+
+post '/:user/:member_id/updateVaccinationSchedule' => sub {
+  return {
+    message => 'Vaccination Schedule Updated'
+  };
+};
+
+# 
+# Get User Vaccination Schedule
+#
+get '/:user/:member_id/getVaccinationSchedule' => sub {
+  
+  if (! $db->{params->{user}}->{login_session_key}) {
+
+      return {
+        ERROR_1104 => 'Invalid API Query as User is not logged in.'
+      };
+    }
+
+    my $vaccination = getVaccination->new($dbh);
+
+    my $v_schedule = $vaccination->get_vaccination(
+        params->{user}, 
+        params->{member_id}
+      );
+
+    if ($v_schedule){
+      return {
+        vaccination_schedule => $v_schedule
+      };
+    }
+    else {
+      return {
+        vaccination_schedule => 'Vaccination is not activated.'
+      };
+    }
+
 };
 
 #
