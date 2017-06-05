@@ -14,38 +14,40 @@ sub new {
   my $class = shift;
 
   my $self = {
-    _dbs => shift,
+    _dbh => shift,
   };
 
   bless $self, $class;
-
-  $self->_vaccination;
 
 # Returning $self Variable
   return $self;
 }
 
-sub _vaccination {
+#
+# Get the Vaccination for Profile Member
+#
+sub get_vaccination {
 
-  my $self = shift;
+  my ($self, $user, $member_id) = @_;
   my %vaccination;
 
-  my $rs = $self->{_dbs}->resultset('Vaccination');
+  my $schedule = $self->{_dbh}->prepare(
+          "SELECT vaccination_date, vaccination_id 
+          from vaccination_schedule 
+          where family_profile_id = ?"
+  );
 
-  while(my $result = $rs->next) {
+  $schedule->execute($member_id) or die $DBI::errstr;
 
-#Creating relation hash and this has needs to be return to the API.
-    $vaccination{$result->vaccine_name} = {
-      vaccine_name => $result->vaccine_name,
-      vaccine_id   => $result->vaccination_id
-    }
+  while (my @row = $schedule->fetchrow_array()) {
+    $vaccination{$member_id}{$row[1]} = {
+      vaccination_id   => $row[1],
+      vaccination_date => $row[0]
+    };
   }
 
-# Updates $self Variable
-  $self->{_vaccination} = \%vaccination;
-
 #Return control to the main function
-  return ;
+  return \%vaccination;
 }
 
 1;
