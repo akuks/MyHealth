@@ -49,7 +49,6 @@ sub new {
 }
 
 sub _relationship {
-  use Data::Dumper;
 
   my $self = shift;
   my %relation;
@@ -61,7 +60,7 @@ sub _relationship {
 #Creating relation hash and this has needs to be return to the API.
     $relation{$result->relationship_name} = {
       relationship_name => $result->relationship_name,
-      relationship_id => $result->relationship_id
+      relationship_id   => $result->relationship_id
     }
   }
 

@@ -5,6 +5,7 @@ use warnings;
 
 use lib "lib/login";
 use Digest::MD5 qw(md5_base64);
+use MyHealthLogger qw<$log>;
 
 use Data::Dumper;
 use Time::Piece;
@@ -62,8 +63,8 @@ sub _initialize {
       'dbi:mysql:database='.$self
                        ->{_confDetails}
                        ->{database},
-       $self->{_confDetails}->{username},
-       $self->{_confDetails}->{password}
+              $self->{_confDetails}->{username},
+              $self->{_confDetails}->{password}
   ) or die 'Can\'t connect to database', "\n";
 
   undef $self->{_confDetails};
@@ -79,16 +80,42 @@ sub checkuser {
 
   my $user_result = $self->{_dbs}->resultset('Login');
 
-  my $result = $user_result->find({
-    email    => $user,
-    password => md5_base64($password)
+  my $result = $user_result->search({
+     -and => [
+        email    => { like => $user },
+        password => { like => md5_base64($password) }
+      ]
   });
 
-  if (defined $result){
-    $self->{$user}->{sessionKey} = md5_base64($password);
-    return $self->{$user}->{sessionKey};
+  print "Result : ", $result, "\n";
+
+  if ($result == 1){
+      $self->{$user}->{sessionKey} = md5_base64($password);
+      return $self->{$user}->{sessionKey};
   }
   else{
+    return 0;
+  }
+}
+
+#
+# Check Email ID Existence
+#
+sub checkemail {
+  my ($self, $user) = @_;
+
+  my $user_result = $self->{_dbs}->resultset('Login');
+
+  my $result = $user_result->search({
+     -and => [
+        email    => { like => $user },
+      ]
+  });
+
+  if ($result == 1){
+    return 1;
+  }
+  else {
     return 0;
   }
 }
@@ -113,7 +140,7 @@ sub create_new_user {
 # Double Check if User already exist in DB.
   my $output = $self->checkuser($user, $password);
 
-  if ($output ne 0){
+  if ($output ne ''){
     print "output : ", $output;
     return ('Fatal Error, User Already Exist in database');
   }
@@ -140,12 +167,28 @@ sub _get_mySql_timestamp {
 
 }
 
+#
 # To be Updated Later
+#
+
 sub reset_password {
   my ($self, $user) = @_;
 
-  return;
+  my $result = $self->{_dbs}->resultset('Login')->search({
+     -and => [
+        email    => { like => $user }
+      ]
+  });
+
+# Succesfully Send the Response.
+  while(my $rs = $result->next){
+      if ($rs->email eq $user) {
+        return 1;
+      }
+  }
+  return 0;
 }
+
 
 # To get login ID
 sub get_login_id {

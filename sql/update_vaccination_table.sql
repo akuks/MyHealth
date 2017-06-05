@@ -1,0 +1,19 @@
+INSERT INTO `MyHealth_DB`.`vaccination`
+(`vaccine_name`)
+VALUES
+('BCG'),
+('HEPB'),
+('POLIO'),
+('DTP'),
+('HIB'),
+('PCV'),
+('RV'),
+('TYPHOID'),
+('MMR'),
+('VERICELLA'),
+('HEPA'),
+('TDAP'),
+('INFLUENZA'),
+('PNEUMPCOCCAL'),
+('ZOOSTER'),
+('HPV');

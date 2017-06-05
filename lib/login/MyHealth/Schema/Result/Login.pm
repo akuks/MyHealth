@@ -135,6 +135,21 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head2 physical_activities
+
+Type: has_many
+
+Related object: L<MyHealth::Schema::Result::PhysicalActivity>
+
+=cut
+
+__PACKAGE__->has_many(
+  "physical_activities",
+  "MyHealth::Schema::Result::PhysicalActivity",
+  { "foreign.login_id" => "self.login_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 session_managements
 
 Type: has_many
@@ -166,8 +181,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-01-08 21:32:15
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:dgIGsDhYmQLenC+sjx9hzw
+# Created by DBIx::Class::Schema::Loader v0.07045 @ 2017-02-20 22:33:37
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:+0FpKn4CpW20vHwC2Uworw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
